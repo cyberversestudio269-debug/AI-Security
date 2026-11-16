@@ -17,7 +17,7 @@ Use this together with [the ISO readiness assessment](./docs/iso-readiness.md), 
 - [x] 12 unit tests pass on Python 3.8.10 and Python 3.12.10.
 - [x] Python 3.12.10 local virtual environment passes all 12 unit tests and `pip check`.
 - [x] Local demo responds at `http://127.0.0.1:8000`.
-- [ ] GitHub Actions workflow targeting Python 3.12 has not yet run.
+- [x] GitHub Actions Python 3.12 workflow passed on commit `fb863f8`.
 - [ ] Not ready for public production deployment or ISO certification.
 
 ## Phase 1 — Before an invite-only pilot
@@ -76,9 +76,8 @@ Use this together with [the ISO readiness assessment](./docs/iso-readiness.md), 
 
 ## Resume here
 
-1. Push the reviewed project files and verify the GitHub Actions Python 3.12 workflow passes.
-2. Update dependency pins if CI or vulnerability checks require it.
-3. Implement versioned database migrations and a durable scan worker before inviting external pilot users.
+1. Implement versioned database migrations and a durable scan worker before inviting external pilot users.
+2. Review dependency pins and add automated vulnerability/dependency update checks.
 
 ## Local demo server
 
