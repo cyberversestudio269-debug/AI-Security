@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Risk Scanner</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">AI SECURITY PILOT</p>
+      <h1>AI Risk Scanner</h1>
+    </div>
+    <div class="actions">
+      <button id="delete-account" class="button danger hidden" type="button">Delete account and data</button>
+      <button id="logout" class="button secondary hidden" type="button">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <p id="notice" class="notice" role="status" aria-live="polite"></p>
+
+    <section id="auth-panel" class="panel">
+      <h2>Sign in or create an account</h2>
+      <p>Use a unique password with at least 12 characters. This pilot does not send verification email.</p>
+      <form id="auth-form" class="form-grid">
+        <label>Email
+          <input id="email" type="email" autocomplete="email" required maxlength="320">
+        </label>
+        <label>Password
+          <input id="password" type="password" autocomplete="current-password" required minlength="12" maxlength="256">
+        </label>
+        <div class="actions">
+          <button class="button" type="submit" data-auth="login">Sign in</button>
+          <button class="button secondary" type="submit" data-auth="register">Create account</button>
+        </div>
+      </form>
+    </section>
+
+    <div id="app-panel" class="hidden">
+      <section class="panel">
+        <h2>1. Add and verify a target</h2>
+        <p>Only HTTPS endpoints on publicly resolvable domains are accepted. Verify control with DNS TXT or a hosted file before scanning.</p>
+        <form id="target-form" class="form-grid">
+          <label>Chat completions endpoint
+            <input id="target-url" type="url" placeholder="https://chat.example.com/v1/chat/completions" required maxlength="2048">
+          </label>
+          <label>Model name
+            <input id="target-model" type="text" value="default" maxlength="200" required>
+          </label>
+          <button class="button" type="submit">Add target</button>
+        </form>
+        <div id="challenge" class="challenge hidden"></div>
+        <div id="targets" class="stack"></div>
+      </section>
+
+      <section class="panel">
+        <h2>2. Run a scan</h2>
+        <p>Live scans require server-side <code>ANTHROPIC_API_KEY</code>. A target API key is used for this scan only and is not saved.</p>
+        <form id="scan-form" class="form-grid">
+          <label>Verified target
+            <select id="target-select">
+              <option value="">Select a verified target</option>
+            </select>
+          </label>
+          <label>Target API key (optional)
+            <input id="target-key" type="password" autocomplete="off" maxlength="4096">
+          </label>
+          <label>Company name for the PDF
+            <input id="company-name" type="text" value="Client" maxlength="120">
+          </label>
+          <fieldset>
+            <legend>Policy questionnaire</legend>
+            <label class="check"><input id="uses-personal-data" type="checkbox"> The chatbot processes personal data</label>
+            <label class="check"><input id="has-human-review" type="checkbox"> Human review or escalation is available</label>
+            <label class="check"><input id="has-role-based-access" type="checkbox"> Role-based access controls are in place</label>
+            <label class="check"><input id="has-retention-policy" type="checkbox"> A data-retention policy is defined</label>
+            <label class="check"><input id="discloses-ai-use" type="checkbox"> Users are told they are interacting with AI</label>
+          </fieldset>
+          <label class="check authorization">
+            <input id="authorized" type="checkbox">
+            I own this target or have permission to test it, and understand replies may contain sensitive data.
+          </label>
+          <div class="actions">
+            <button id="live-scan" class="button" type="submit">Start authorized scan</button>
+            <button id="demo-scan" class="button secondary" type="button">Run offline demo</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>3. Scan results</h2>
+        <div id="scan-list" class="stack"></div>
+        <div id="scan-detail"></div>
+      </section>
+    </div>
+  </main>
+  <footer>
+    Automated results are indicative, not proof of security or legal compliance. Store reports and raw replies securely.
+  </footer>
+</body>
+</html>

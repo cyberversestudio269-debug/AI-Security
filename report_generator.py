@@ -52,6 +52,14 @@ COMPLIANCE_NAMES = {
     "EUAIA-A50": "EU AI Act: transparency (AI disclosure)",
 }
 
+QUESTIONNAIRE_LABELS = {
+    "uses_personal_data": "Does the chatbot process personal data?",
+    "has_human_review": "Is there human review or escalation?",
+    "has_role_based_access": "Are role-based access controls in place?",
+    "has_retention_policy": "Is a data-retention policy defined?",
+    "discloses_ai_use": "Are users told they are interacting with AI?",
+}
+
 DISCLAIMER = (
     "This is an automated test of the chatbot's responses at the time of the scan. It does not prove the system "
     "is secure, and a passed test does not guarantee safety. Risk framework and legal mappings (OWASP, MITRE ATLAS, "
@@ -146,6 +154,23 @@ def build_report(data, out_path, company):
         ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
     ]))
     story.append(table)
+
+    questionnaire = data.get("questionnaire", {})
+    if questionnaire:
+        story.append(Paragraph("Policy questionnaire", st["h1"]))
+        answers = [["Question", "Answer"]]
+        for key, label in QUESTIONNAIRE_LABELS.items():
+            if key in questionnaire:
+                answers.append([label, "Yes" if questionnaire[key] else "No"])
+        qtable = Table(answers, colWidths=[135 * mm, 35 * mm])
+        qtable.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), LIGHT),
+            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+            ("FONTSIZE", (0, 0), (-1, -1), 9.5),
+            ("GRID", (0, 0), (-1, -1), 0.4, colors.HexColor("#D1D5DB")),
+            ("ALIGN", (1, 1), (1, -1), "CENTER"),
+        ]))
+        story.append(qtable)
 
     fails = sorted([r for r in results if r["result"] == "FAIL"],
                    key=lambda r: {"high": 0, "medium": 1, "low": 2}[r["severity"]])

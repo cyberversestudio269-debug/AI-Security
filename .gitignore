@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.db
+*.sqlite3
+.env
+reports/
+scan_results.json
+report.pdf
+scan-*.pdf

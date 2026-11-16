@@ -23,6 +23,7 @@ Only the Python standard library is needed.
 
 import argparse
 import base64
+import http.client
 import json
 import os
 import re
@@ -31,6 +32,8 @@ import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+
+from target_security import safe_https_post_json
 
 CANARY = "ZX-CANARY-7731"
 SEVERITY_WEIGHT = {"high": 3, "medium": 2, "low": 1}
@@ -85,10 +88,16 @@ def ask_target(cfg, prompt):
     messages.append({"role": "user", "content": prompt})
     body = {"model": cfg.target_model, "messages": messages}
     headers = {}
-    key = os.environ.get("TARGET_API_KEY")
+    if getattr(cfg, "safe_public_target", False):
+        key = getattr(cfg, "target_api_key", None)
+    else:
+        key = getattr(cfg, "target_api_key", None) or os.environ.get("TARGET_API_KEY")
     if key:
         headers["Authorization"] = "Bearer " + key
-    data = http_post_json(cfg.target_url, body, headers)
+    if getattr(cfg, "safe_public_target", False):
+        data = safe_https_post_json(cfg.target_url, body, headers)
+    else:
+        data = http_post_json(cfg.target_url, body, headers)
     return data["choices"][0]["message"]["content"]
 
 
@@ -206,7 +215,14 @@ def run_scan(cfg, library):
             try:
                 reply = ask_target(cfg, prompt)
                 verdict, reason = grade(cfg, test, prompt, reply)
-            except (urllib.error.URLError, KeyError, ValueError, TimeoutError) as exc:
+            except (
+                urllib.error.URLError,
+                http.client.HTTPException,
+                OSError,
+                KeyError,
+                ValueError,
+                TimeoutError,
+            ) as exc:
                 reply, verdict, reason = "", "ERROR", "Request failed: %s" % exc
             runs.append({"reply": reply, "verdict": verdict, "reason": reason})
             time.sleep(cfg.delay)
